@@ -1,0 +1,31 @@
+name: 'Upcover Markdown coverage reporter'
+description: 'GitHub action for creating markdown coverage report from Istanbul text report and add in PR comment'
+author: 'Upcover'
+branding:
+  icon: 'message-square'
+  color: 'gray-dark'
+inputs:
+  textReportPath:
+    required: true
+    description: 'path to the coverage report in Istanbul text format'
+    default: './coverage/coverage.txt'
+  githubToken:
+    required: true
+    description: 'Github access token'
+    default: ''
+  srcBasePath:
+    required: false
+    description: 'base path for the source folder'
+    default: './src'
+  fileNames:
+    required: false
+    description: 'name of the files changed in the PR'
+    default: '[]'
+  fullCoverage:
+    required: false
+    description: 'Wether to generate full coverage report or With specific files'
+    default: 'true'
+
+runs:
+  using: 'node18'
+  main: 'dist/index.js'
