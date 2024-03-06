@@ -27,5 +27,5 @@ inputs:
     default: 'true'
 
 runs:
-  using: 'node20'
-  main: 'lib/main.js'
+  using: 'node16'
+  main: 'dist/index.js'
