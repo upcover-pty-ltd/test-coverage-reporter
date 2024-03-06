@@ -20,7 +20,7 @@ The action get the coverage file path and then add the comment with coverage rep
 ```yaml
 steps:
   - name: Prepare markdown and add comment on PR
-    uses: upcover-pty-ltd/test-coverage-reporter@v1.2
+    uses: upcover-pty-ltd/test-coverage-reporter@v1.3
     with:
       textReportPath: './coverage/coverage.txt'
       githubToken: ${{ github.token}}
@@ -38,7 +38,7 @@ steps:
       src:
         - src/**
   - name: Prepare markdown and add comment on PR
-    uses: upcover-pty-ltd/test-coverage-reporter@v1.2
+    uses: upcover-pty-ltd/test-coverage-reporter@v1.3
     with:
       textReportPath: './coverage/text-report.txt'
       githubToken: ${{ github.token}}
