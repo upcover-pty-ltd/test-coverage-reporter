@@ -16,8 +16,6 @@ async function run(): Promise<void> {
       core.getInput('fullCoverage') === 'false' ? false : true
     const githubToken: string = core.getInput('githubToken') || ''
 
-    const ref = github.context.ref
-    const branchName = ref.replace('refs/heads/', '')
     const {repo: repository, owner} = github.context.repo
     if (!repository) {
       core.error('Can`t detect repo url')
@@ -39,10 +37,8 @@ async function run(): Promise<void> {
     const octokit = github.getOctokit(githubToken)
     const commentBody = fullCoverage
       ? `## 🚀 Full code coverage\n
-       Check the full report at: https://upcover-pty-ltd.github.io/firebase-functions/${branchName}\n
     ${mdReport}`
       : `## 🚀 Current changes code coverage\n
-      Check the full report at: https://upcover-pty-ltd.github.io/firebase-functions/${branchName}\n
       ${mdReport}`
     await octokit.rest.issues.createComment({
       owner,
