@@ -40,7 +40,8 @@ async function run() {
         const fileNames = core
             .getInput('fileNames')
             .split(' ')
-            .map((filename) => filename.trim()) || [];
+            .map((filename) => filename.trim().replace('functions/', '')) ||
+            [];
         const fullCoverage = core.getInput('fullCoverage') === 'false' ? false : true;
         const githubToken = core.getInput('githubToken') || '';
         const { repo: repository, owner } = github.context.repo;
