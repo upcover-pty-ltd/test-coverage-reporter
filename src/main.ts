@@ -35,16 +35,14 @@ async function run(): Promise<void> {
     })
 
     const octokit = github.getOctokit(githubToken)
-    const commentBody = fullCoverage
-      ? `## 🚀 Full code coverage\n
-    ${mdReport}`
-      : `## 🚀 Current changes code coverage\n
-      ${mdReport}`
+
     await octokit.rest.issues.createComment({
       owner,
       repo: repository,
       issue_number: github.context.issue.number,
-      body: commentBody
+      body: fullCoverage
+        ? `## 🚀 Full code coverage\n${mdReport}`
+        : `## 🚀 Current changes code coverage\n${mdReport}`
     })
     // core.setOutput('markdownReport', mdReport)
   } catch (error) {
