@@ -11,9 +11,8 @@ async function run(): Promise<void> {
       core
         .getInput('fileNames')
         .split(' ')
-        .map((filename: string) =>
-          filename.trim().replace('functions/src/', '')
-        ) || []
+        .map((filename: string) => filename.trim().replace('functions/', '')) ||
+      []
     const fullCoverage: boolean =
       core.getInput('fullCoverage') === 'false' ? false : true
     const githubToken: string = core.getInput('githubToken') || ''

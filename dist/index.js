@@ -40,7 +40,8 @@ async function run() {
         const fileNames = core
             .getInput('fileNames')
             .split(' ')
-            .map((filename) => filename.trim().replace('functions/src/', '')) || [];
+            .map((filename) => filename.trim().replace('functions/', '')) ||
+            [];
         const fullCoverage = core.getInput('fullCoverage') === 'false' ? false : true;
         const githubToken = core.getInput('githubToken') || '';
         const { repo: repository, owner } = github.context.repo;
@@ -99,7 +100,9 @@ const path_1 = __importDefault(__nccwpck_require__(1017));
 const getReportParts_1 = __nccwpck_require__(7019);
 const status_1 = __nccwpck_require__(1141);
 const getBasePath_1 = __nccwpck_require__(916);
+const parseTextFile_1 = __nccwpck_require__(2599);
 async function getMarkdownReport({ pathToTextReport, fileNames, fullCoverage, ...restOptions }) {
+    await (0, parseTextFile_1.modifyFileContent)(pathToTextReport);
     const textReport = await promises_1.default.readFile(pathToTextReport, { encoding: 'utf8' });
     return getMarkdownReportFromTextReport({
         textReport,
@@ -210,6 +213,42 @@ function getReportParts(rawCoverage) {
     return { coverageInfoHeader, coverageInfoRows };
 }
 exports.getReportParts = getReportParts;
+
+
+/***/ }),
+
+/***/ 2599:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.modifyFileContent = void 0;
+const fs_1 = __nccwpck_require__(7147);
+async function modifyFileContent(filePath) {
+    // Read the file content
+    const data = await fs_1.promises.readFile(filePath, 'utf8');
+    const lines = data.split('\n');
+    const modifiedLines = [];
+    let prefix = 'src';
+    lines.forEach(line => {
+        if (!line.startsWith('src') &&
+            !line.startsWith('---') &&
+            line.split('|')[0].trim().endsWith('.ts')) {
+            const fileName = line.split('|')[0].trim();
+            const modifiedLine = `${prefix}/${fileName}|${line.substring(line.indexOf('|') + 1)}`;
+            modifiedLines.push(modifiedLine);
+        }
+        else {
+            prefix = line.split('|')[0].trim();
+            modifiedLines.push(line);
+        }
+    });
+    const modifiedContent = modifiedLines.join('\n');
+    // Write the modified content back to the file
+    await fs_1.promises.writeFile(filePath, modifiedContent, 'utf8');
+}
+exports.modifyFileContent = modifyFileContent;
 
 
 /***/ }),

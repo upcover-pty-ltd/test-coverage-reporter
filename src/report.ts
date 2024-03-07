@@ -4,6 +4,7 @@ import path from 'path'
 import {getReportParts} from './utils/getReportParts'
 import {getStatus, statusHeader} from './utils/status'
 import {getBasePath} from './utils/getBasePath'
+import {modifyFileContent} from './utils/parseTextFile'
 
 export async function getMarkdownReport({
   pathToTextReport,
@@ -16,6 +17,7 @@ export async function getMarkdownReport({
   fullCoverage: boolean
   srcBasePath: string
 }): Promise<string> {
+  await modifyFileContent(pathToTextReport)
   const textReport = await fs.readFile(pathToTextReport, {encoding: 'utf8'})
   return getMarkdownReportFromTextReport({
     textReport,
@@ -109,4 +111,3 @@ function addStatusColumn(headerRows: string[]): string[] {
 
   return [headerWithStatus, dividerWithStatus, ...commonRowsWithStatus]
 }
-
