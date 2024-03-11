@@ -6,6 +6,13 @@ import {getStatus, statusHeader} from './utils/status'
 import {getBasePath} from './utils/getBasePath'
 import {modifyFileContent} from './utils/parseTextFile'
 
+interface CoverageStats {
+  stmts: number
+  branch: number
+  funcs: number
+  lines: number
+}
+
 export async function getMarkdownReport({
   pathToTextReport,
   fileNames,
@@ -25,6 +32,37 @@ export async function getMarkdownReport({
     fullCoverage,
     ...restOptions
   })
+}
+
+export async function getCovageStats({
+  pathToTextReport
+}: {
+  pathToTextReport: string
+}): Promise<CoverageStats> {
+  const textReport = await fs.readFile(pathToTextReport, {encoding: 'utf8'})
+  const {coverageInfoHeader} = getReportParts(textReport)
+  const coverageStats: CoverageStats = {
+    stmts: 0,
+    branch: 0,
+    funcs: 0,
+    lines: 0
+  }
+
+  for (const row of coverageInfoHeader) {
+    if (row.startsWith('All files')) {
+      const [, stmtsStr, branchStr, funcsStr, linesStr] = row
+        .split('|')
+        .map(item => item.trim())
+      coverageStats.stmts = parseFloat(stmtsStr)
+      coverageStats.branch = parseFloat(branchStr)
+      coverageStats.funcs = parseFloat(funcsStr)
+      coverageStats.lines = parseFloat(linesStr)
+
+      break
+    }
+  }
+
+  return coverageStats
 }
 
 export function getMarkdownReportFromTextReport({

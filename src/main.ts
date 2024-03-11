@@ -1,6 +1,6 @@
 import * as github from '@actions/github'
 import * as core from '@actions/core'
-import {getMarkdownReport} from './report'
+import {getCovageStats, getMarkdownReport} from './report'
 
 async function run(): Promise<void> {
   try {
@@ -35,16 +35,30 @@ async function run(): Promise<void> {
       fullCoverage
     })
 
-    const octokit = github.getOctokit(githubToken)
+    const coverageStats = await getCovageStats({
+      pathToTextReport: textCoverageReportPath
+    })
+    let bodyComment = fullCoverage
+      ? `## 🚀 Full code coverage\n${mdReport}\n`
+      : `## 🚀 Current changes code coverage\n${mdReport}`
 
+    if (coverageStats.lines < 40) {
+      bodyComment += `\n## 🚨🚨 Coverage does not meet the global threshold of 40%\nAdd missing lines coverage to fix this. Current is ${coverageStats.lines}%`
+    }
+
+    const octokit = github.getOctokit(githubToken)
     await octokit.rest.issues.createComment({
       owner,
       repo: repository,
       issue_number: github.context.issue.number,
-      body: fullCoverage
-        ? `## 🚀 Full code coverage\n${mdReport}`
-        : `## 🚀 Current changes code coverage\n${mdReport}`
+      body: bodyComment
     })
+
+    if (coverageStats.lines < 40) {
+      core.setFailed(
+        `Coverage does not meet the global threshold of 40%. Add missing lines coverage to fix this. Current is ${coverageStats.lines}%`
+      )
+    }
     // core.setOutput('markdownReport', mdReport)
   } catch (error) {
     if (error instanceof Error) {

@@ -60,15 +60,25 @@ async function run() {
             fileNames,
             fullCoverage
         });
+        const coverageStats = await (0, report_1.getCovageStats)({
+            pathToTextReport: textCoverageReportPath
+        });
+        let bodyComment = fullCoverage
+            ? `## 🚀 Full code coverage\n${mdReport}\n`
+            : `## 🚀 Current changes code coverage\n${mdReport}`;
+        if (coverageStats.lines < 40) {
+            bodyComment += `\n## 🚨🚨 Coverage does not meet the global threshold of 40%\nAdd missing lines coverage to fix this. Current is ${coverageStats.lines}%`;
+        }
         const octokit = github.getOctokit(githubToken);
         await octokit.rest.issues.createComment({
             owner,
             repo: repository,
             issue_number: github.context.issue.number,
-            body: fullCoverage
-                ? `## 🚀 Full code coverage\n${mdReport}`
-                : `## 🚀 Current changes code coverage\n${mdReport}`
+            body: bodyComment
         });
+        if (coverageStats.lines < 40) {
+            core.setFailed(`Coverage does not meet the global threshold of 40%. Add missing lines coverage to fix this. Current is ${coverageStats.lines}%`);
+        }
         // core.setOutput('markdownReport', mdReport)
     }
     catch (error) {
@@ -94,7 +104,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.formatUncoveredLines = exports.processRow = exports.getMarkdownReportFromTextReport = exports.getMarkdownReport = void 0;
+exports.formatUncoveredLines = exports.processRow = exports.getMarkdownReportFromTextReport = exports.getCovageStats = exports.getMarkdownReport = void 0;
 const promises_1 = __importDefault(__nccwpck_require__(3292));
 const path_1 = __importDefault(__nccwpck_require__(1017));
 const getReportParts_1 = __nccwpck_require__(7019);
@@ -112,6 +122,30 @@ async function getMarkdownReport({ pathToTextReport, fileNames, fullCoverage, ..
     });
 }
 exports.getMarkdownReport = getMarkdownReport;
+async function getCovageStats({ pathToTextReport }) {
+    const textReport = await promises_1.default.readFile(pathToTextReport, { encoding: 'utf8' });
+    const { coverageInfoHeader } = (0, getReportParts_1.getReportParts)(textReport);
+    const coverageStats = {
+        stmts: 0,
+        branch: 0,
+        funcs: 0,
+        lines: 0
+    };
+    for (const row of coverageInfoHeader) {
+        if (row.startsWith('All files')) {
+            const [, stmtsStr, branchStr, funcsStr, linesStr] = row
+                .split('|')
+                .map(item => item.trim());
+            coverageStats.stmts = parseFloat(stmtsStr);
+            coverageStats.branch = parseFloat(branchStr);
+            coverageStats.funcs = parseFloat(funcsStr);
+            coverageStats.lines = parseFloat(linesStr);
+            break;
+        }
+    }
+    return coverageStats;
+}
+exports.getCovageStats = getCovageStats;
 function getMarkdownReportFromTextReport({ textReport, fileNames, fullCoverage, srcBasePath }) {
     const { coverageInfoHeader, coverageInfoRows } = (0, getReportParts_1.getReportParts)(textReport);
     const normalizedBasePath = path_1.default.relative('', srcBasePath);
