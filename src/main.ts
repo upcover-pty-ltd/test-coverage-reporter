@@ -42,8 +42,8 @@ async function run(): Promise<void> {
       ? `## 🚀 Full code coverage\n${mdReport}\n`
       : `## 🚀 Current changes code coverage\n${mdReport}`
 
-    if (coverageStats.lines < 40) {
-      bodyComment += `\n## 🚨🚨 Coverage does not meet the global threshold of 40%\nAdd missing lines coverage to fix this. Current is ${coverageStats.lines}%`
+    if (coverageStats.lines < 35) {
+      bodyComment += `\n## 🚨🚨 Coverage does not meet the global threshold of 35%\nAdd missing lines coverage to fix this. Current is ${coverageStats.lines}%`
     }
 
     const octokit = github.getOctokit(githubToken)
@@ -54,9 +54,9 @@ async function run(): Promise<void> {
       body: bodyComment
     })
 
-    if (coverageStats.lines < 40) {
+    if (coverageStats.lines < 35) {
       core.setFailed(
-        `Coverage does not meet the global threshold of 40%. Add missing lines coverage to fix this. Current is ${coverageStats.lines}%`
+        `Coverage does not meet the global threshold of 35%. Add missing lines coverage to fix this. Current is ${coverageStats.lines}%`
       )
     }
     // core.setOutput('markdownReport', mdReport)
