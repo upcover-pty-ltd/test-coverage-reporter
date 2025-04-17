@@ -14,6 +14,9 @@
     "test:coverage": "jest --coverage --coverageReporters=text",
     "all": "npm run build && npm run format && npm run lint && npm run package && npm test"
   },
+  "engines": {
+    "node": "22"
+  },
   "author": "Upcover",
   "dependencies": {
     "@actions/core": "^1.10.0",
@@ -21,6 +24,7 @@
   },
   "devDependencies": {
     "@types/node": "^20.6.0",
+    "@typescript-eslint/eslint-plugin": "^6.7.0",
     "@typescript-eslint/parser": "^6.7.0",
     "@vercel/ncc": "^0.36.1",
     "eslint": "^8.49.0",

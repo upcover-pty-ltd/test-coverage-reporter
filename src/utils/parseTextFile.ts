@@ -8,7 +8,7 @@ export async function modifyFileContent(filePath: string): Promise<void> {
   const modifiedLines: string[] = []
   let prefix = 'src'
 
-  lines.forEach(line => {
+  for (const line of lines) {
     if (
       !line.startsWith('src') &&
       !line.startsWith('---') &&
@@ -23,7 +23,7 @@ export async function modifyFileContent(filePath: string): Promise<void> {
       prefix = line.split('|')[0].trim()
       modifiedLines.push(line)
     }
-  })
+  }
 
   const modifiedContent: string = modifiedLines.join('\n')
 

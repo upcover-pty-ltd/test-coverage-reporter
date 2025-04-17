@@ -16,6 +16,8 @@ async function run(): Promise<void> {
     const fullCoverage: boolean =
       core.getInput('fullCoverage') === 'false' ? false : true
     const githubToken: string = core.getInput('githubToken') || ''
+    const checkCoverage: boolean =
+      core.getInput('checkCoverage') === 'false' ? false : true
 
     const {repo: repository, owner} = github.context.repo
     if (!repository) {
@@ -54,7 +56,7 @@ async function run(): Promise<void> {
       body: bodyComment
     })
 
-    if (coverageStats.lines < 35) {
+    if (checkCoverage && coverageStats.lines < 35) {
       core.setFailed(
         `Coverage does not meet the global threshold of 35%. Add missing lines coverage to fix this. Current is ${coverageStats.lines}%`
       )
