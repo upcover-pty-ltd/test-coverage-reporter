@@ -45,6 +45,7 @@ steps:
       srcBasePath: './src'
       fileNames: ${{ steps.changed-files.outputs.src_all_changed_files }}
       fullCoverage: 'false'
+      checkCoverage:'false
 ```
 
 ## API
@@ -58,6 +59,7 @@ steps:
 | `srcBasePath`    | `string`   | `'./src'`                   | Base path for the source folder.                                                     |
 | `fileNames`      | `string[]` | `[]`                        | Names of file changed in the current PR.                                             |
 | `fullCoverage`   | `string`   | `'true'`                    | Generate full source coverage or the files changed.                                  |
+| `checkCoverage`  | `string`   | `'true'`                    | Generate full source coverage or the files changed.                                  |
 
 ## How to get a text coverage report
 
